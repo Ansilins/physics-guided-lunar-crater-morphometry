@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunar Crater Depth Analysis - Extract</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('/static/images/solar_dark_theme.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .navbar a {
+            color: #e0e0e0 !important;
+        }
+        .container {
+            background-color: rgba(0, 10, 20, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        h1, h2, h3 {
+            color: #ffffff;
+            text-shadow: 1px 1px 3px #000000;
+        }
+        .btn-primary {
+            background-color: #2a4066;
+            border-color: #2a4066;
+        }
+        .btn-primary:hover {
+            background-color: #1e2f4d;
+            border-color: #1e2f4d;
+        }
+        .form-label {
+            color: #d0d0d0;
+        }
+        .form-control {
+            background-color: #1a1f2a;
+            color: #e0e0e0;
+            border-color: #333;
+        }
+        a.text-light {
+            color: #d0d0d0 !important;
+        }
+        a.text-light:hover {
+            color: #ffffff !important;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">Lunar Crater Analysis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('extract_page') }}">Extract</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('input_page') }}">Input</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('results') }}">Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center mb-4">Extract GeoTIFF Data</h1>
+
+        <h2>Upload GeoTIFF</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="extract">
+            <div class="mb-3">
+                <label for="tiff_file" class="form-label">Select GeoTIFF File:</label>
+                <input type="file" class="form-control" name="tiff_file" id="tiff_file" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Extract</button>
+        </form>
+
+        {% if extracted_files %}
+        <h3 class="mt-4">Extracted Files</h3>
+        <p>PNG: <a href="{{ url_for('download_file', filename=extracted_files.png) }}" class="text-light">{{ extracted_files.png }}</a></p>
+        <p>TIFF: <a href="{{ url_for('download_file', filename=extracted_files.tiff) }}" class="text-light">{{ extracted_files.tiff }}</a></p>
+        {% else %}
+        <p class="mt-4">Upload a GeoTIFF and extract to download PNG and TIFF files.</p>
+        {% endif %}
+
+        <h2 class="mt-4">Calculate Solar Geometry</h2>
+        <form method="POST">
+            <input type="hidden" name="action" value="calculate">
+            <div class="mb-3">
+                <label for="obs_lat" class="form-label">Observer Latitude:</label>
+                <input type="number" step="any" class="form-control" name="obs_lat" id="obs_lat" value="{{ obs_lat }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="obs_lon" class="form-label">Observer Longitude:</label>
+                <input type="number" step="any" class="form-control" name="obs_lon" id="obs_lon" value="{{ obs_lon }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="sub_lat" class="form-label">Sub-Solar Latitude:</label>
+                <input type="number" step="any" class="form-control" name="sub_lat" id="sub_lat" value="{{ sub_lat }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="sub_lon" class="form-label">Sub-Solar Longitude:</label>
+                <input type="number" step="any" class="form-control" name="sub_lon" id="sub_lon" value="{{ sub_lon }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Calculate</button>
+        </form>
+
+        {% if solar_results %}
+        <h3 class="mt-4">Solar Geometry Results</h3>
+        <p>Sun Elevation: {{ solar_results.elevation }}°</p>
+        <p>Azimuth: {{ solar_results.azimuth }}°</p>
+        {% endif %}
+
+        {% if extracted_files and solar_results %}
+        <form method="POST" action="{{ url_for('input_page') }}">
+            <input type="hidden" name="png_file_path" value="{{ extracted_files.png_path }}">
+            <input type="hidden" name="tiff_file_path" value="{{ extracted_files.tiff_path }}">
+            <input type="hidden" name="sun_elevation" value="{{ solar_results.elevation }}">
+            <input type="hidden" name="sun_azimuth" value="{{ solar_results.azimuth }}">
+            <button type="submit" class="btn btn-primary mt-4">Proceed to Input</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

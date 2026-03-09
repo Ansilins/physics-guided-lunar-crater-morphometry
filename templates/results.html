@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - Lunar Crater Detection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('{{ url_for("static", filename="images/solar_dark_theme.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .navbar a {
+            color: #e0e0e0 !important;
+        }
+        .container {
+            background-color: rgba(0, 10, 20, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #ffffff;
+            text-shadow: 1px 1px 3px #000000;
+        }
+        p, li {
+            line-height: 1.6;
+        }
+        a {
+            color: #00bfff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #1a1f2a;
+            color: #e0e0e0;
+        }
+        .results-table th, .results-table td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: center;
+        }
+        .results-table th {
+            background-color: #2a4066;
+        }
+        .results-table tr:nth-child(even) {
+            background-color: #2a2a3a;
+        }
+        .chart-image {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 20px auto;
+            border-radius: 8px;
+        }
+        .download-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2a4066;
+            border-color: #2a4066;
+            color: #e0e0e0;
+            border-radius: 5px;
+            text-align: center;
+            margin: 10px;
+        }
+        .download-button:hover {
+            background-color: #1e2f4d;
+            border-color: #1e2f4d;
+            color: #e0e0e0;
+            text-decoration: none;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            .results-table th, .results-table td {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            .results-table {
+                font-size: 0.8em;
+            }
+            .results-table th, .results-table td {
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">Lunar Crater Analysis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('extract_page') }}">Extract</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('input_page') }}">Input</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('results') }}">Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center mb-4">Lunar Crater Detection Results</h1>
+
+        <div class="section">
+            <h2 class="text-center mb-4">Analysis Summary</h2>
+            <p class="text-center">
+                Number of Paired Craters Detected: {{ num_craters }}<br>
+                Combined Accuracy: {{ '%.2f' % combined_accuracy }}%<br>
+                Combined Difference: {{ '%.2f' % combined_difference }}%
+            </p>
+        </div>
+
+        <div class="section">
+            <h2 class="text-center mb-4">Crater Data</h2>
+            {% if crater_data %}
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Crater ID</th>
+                        <th>Method</th>
+                        <th>Center X</th>
+                        <th>Center Y</th>
+                        <th>Diameter (m)</th>
+                        <th>Depth (m)</th>
+                        <th>Volume (m³)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in crater_data %}
+                    <tr>
+                        <td>{{ row['crater_id'] }}</td>
+                        <td>{{ row['method'] }}</td>
+                        <td>{{ '%.1f' % row['center_x'] }}</td>
+                        <td>{{ '%.1f' % row['center_y'] }}</td>
+                        <td>{{ '%.2f' % row['diameter_m'] }}</td>
+                        <td>{{ '%.2f' % row['depth_m'] }}</td>
+                        <td>{{ '%.2f' % row['volume_m3'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="text-center">
+                <a href="{{ url_for('download_csv') }}" class="download-button">Download CSV</a>
+            </div>
+            {% else %}
+            <p class="text-center">No crater data available. Please run a detection first.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2 class="text-center mb-4">Comparison Charts</h2>
+            {% if comparison_charts %}
+                {% for chart in comparison_charts %}
+                    {% set chart_type = chart.split('_')[0] %}
+                    <div class="text-center">
+                        <img src="{{ url_for('static', filename='output/' + chart) }}" alt="{{ chart_type }} Comparison Chart" class="chart-image">
+                        <a href="{{ url_for('download_chart', chart_type=chart_type) }}" class="download-button">Download {{ chart_type|capitalize }} Chart</a>
+                    </div>
+                {% endfor %}
+            {% else %}
+            <p class="text-center">No comparison charts available. Please run a detection first.</p>
+            {% endif %}
+        </div>
+
+        <p class="text-center"><a href="{{ url_for('index') }}">Back to Home</a></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

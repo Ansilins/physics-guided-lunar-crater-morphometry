@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunar Crater Detection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('{{ url_for("static", filename="images/solar_dark_theme.jpg") }}');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .navbar a {
+            color: #e0e0e0 !important;
+        }
+        .container {
+            background-color: rgba(0, 10, 20, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #ffffff;
+            text-shadow: 1px 1px 3px #000000;
+        }
+        p, li {
+            line-height: 1.6;
+        }
+        a {
+            color: #00bfff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .welcome {
+            text-align: center;
+            background-color: rgba(0, 10, 20, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .btn-primary {
+            background-color: #2a4066;
+            border-color: #2a4066;
+        }
+        .btn-primary:hover {
+            background-color: #1e2f4d;
+            border-color: #1e2f4d;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">Lunar Crater Analysis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('extract_page') }}">Extract</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('input_page') }}">Input</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('results') }}">Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome">
+            <h1 class="text-center mb-4">Welcome to Lunar Crater Detection</h1>
+            <p>
+                Greetings, space enthusiasts and researchers! We’re thrilled to have you here to explore the fascinating world of lunar craters with our advanced detection tool. Dive in and discover the secrets of the Moon’s surface!
+            </p>
+        </div>
+
+        <div class="section">
+            <h2 class="text-center mb-4">Introduction to the Project</h2>
+            <p>
+                The Lunar Crater Detection project is an innovative tool designed to analyze the Moon’s surface by detecting and measuring craters using advanced computer vision techniques. At its core, the project leverages the shadow method to calculate the depth of craters in 2D images, complemented by Digital Elevation Model (DEM) analysis for a comprehensive understanding of crater morphology. By combining these methods, we provide precise measurements of crater diameter, depth, and volume, enabling a detailed comparison of detection techniques.
+            </p>
+            <p>
+                This project was developed to bridge the gap between traditional manual crater analysis and modern automated methods, making it easier for researchers to study lunar surface features with high accuracy and efficiency.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2 class="text-center mb-4">Use in Astronomical Studies</h2>
+            <p>
+                While other methods may offer higher accuracy, our approach stands out by automating 2D image analysis using two specialized models: one to detect shadows and another to identify craters. By combining the outputs of these models, we provide a unique, efficient, and accessible tool for lunar research. This method, though innovative, leverages shadow-based depth calculations to offer valuable insights, especially in scenarios where advanced equipment is limited. Here’s how it contributes:
+            </p>
+            <ul>
+                <li><strong>Impact History Analysis</strong> - Crater dimensions (diameter, depth, and volume) provide insights into the Moon’s impact history, helping astronomers estimate the age and intensity of meteorite impacts.</li>
+                <li><strong>Surface Evolution</strong> - By studying crater morphology, researchers can infer how the lunar surface has evolved over billions of years due to impacts, volcanic activity, and erosion processes.</li>
+                <li><strong>Landing Site Selection</strong> - Accurate crater measurements are essential for identifying safe landing sites for future lunar missions, ensuring spacecraft can avoid hazardous terrain.</li>
+                <li><strong>Resource Exploration</strong> - Craters often expose subsurface materials. Analyzing their depth and volume aids in identifying potential resource deposits, such as water ice, which is critical for sustained lunar exploration.</li>
+                <li><strong>Comparative Planetology</strong> - The techniques developed here can be applied to other celestial bodies, enhancing our understanding of planetary surfaces across the solar system.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2 class="text-center mb-4">What to Expect</h2>
+            <p>
+                This tool guides you through a seamless process to detect and analyze lunar craters:
+            </p>
+            <ul>
+                <li><strong>Extract Page</strong> - Upload your GeoTIFF file to extract PNG and TIFF bands for visualization and elevation data.</li>
+                <li><strong>Input Page</strong> - Run the detection process using shadow and DEM methods to identify craters and measure their properties.</li>
+                <li><strong>Results Page</strong> - View detailed comparisons of crater measurements:
+                    <ul>
+                        <li><strong>Crater Data Table</strong> - A downloadable CSV file containing crater IDs, center coordinates, diameters, depths, and volumes for both Shadow and DEM methods.</li>
+                        <li><strong>Comparison Charts</strong> - High-quality visualizations comparing diameter, depth, and volume between the two methods, helping you understand discrepancies and accuracies.</li>
+                        <li><strong>Accuracy Metrics</strong> - An overall accuracy score and difference percentage, summarizing how closely the Shadow and DEM methods align for your dataset.</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>
+                Whether you're a researcher, student, or lunar enthusiast, our tool provides actionable insights to deepen your understanding of the Moon’s surface.
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

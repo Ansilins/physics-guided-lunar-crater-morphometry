@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunar Crater Depth Analysis - Input</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('/static/images/solar_dark_theme.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .navbar a {
+            color: #e0e0e0 !important;
+        }
+        .container {
+            background-color: rgba(0, 10, 20, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        h1, h2, h3 {
+            color: #ffffff;
+            text-shadow: 1px 1px 3px #000000;
+        }
+        .btn-primary {
+            background-color: #2a4066;
+            border-color: #2a4066;
+        }
+        .btn-primary:hover {
+            background-color: #1e2f4d;
+            border-color: #1e2f4d;
+        }
+        .form-label {
+            color: #d0d0d0;
+        }
+        .form-control {
+            background-color: #1a1f2a;
+            color: #e0e0e0;
+            border-color: #333;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .table {
+            background-color: #1a1f2a;
+            color: #e0e0e0;
+        }
+        .table th, .table td {
+            border-color: #333;
+        }
+        .table thead th {
+            background-color: #2a4066;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">Lunar Crater Analysis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('extract_page') }}">Extract</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('input_page') }}">Input</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('results') }}">Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center mb-4">Input Detection Parameters</h1>
+
+        <h2>Upload Detection Files</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="detect">
+            <div class="mb-3">
+                <label for="png_file" class="form-label">PNG File (Band 1):</label>
+                <input type="file" class="form-control" name="png_file" id="png_file">
+            </div>
+            <div class="mb-3">
+                <label for="tiff_file" class="form-label">TIFF File (Band 6):</label>
+                <input type="file" class="form-control" name="tiff_file" id="tiff_file">
+            </div>
+            <div class="mb-3">
+                <label for="sun_elevation" class="form-label">Sun Elevation (°):</label>
+                <input type="number" step="any" class="form-control" name="sun_elevation" id="sun_elevation" value="{{ sun_elevation|default(172) }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="sun_azimuth" class="form-label">Sun Azimuth (°):</label>
+                <input type="number" step="any" class="form-control" name="sun_azimuth" id="sun_azimuth" value="{{ sun_azimuth|default(172) }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Run Detection</button>
+        </form>
+
+        {% if shadow_combined %}
+        <h2 class="mt-4">Detection Results</h2>
+        <h3>Shadow Detection</h3>
+        <img src="{{ url_for('static', filename='output/' + shadow_combined) }}" alt="Shadow Detection">
+        <div class="text-center mb-3">
+            <a href="{{ url_for('download_shadow_image') }}" class="btn btn-primary">Download Shadow Detection Image</a>
+        </div>
+
+        <h3>DEM Detection</h3>
+        <img src="{{ url_for('static', filename='output/' + dem_combined) }}" alt="DEM Detection">
+        <div class="text-center mb-3">
+            <a href="{{ url_for('download_dem_image') }}" class="btn btn-primary">Download DEM Detection Image</a>
+        </div>
+
+        <h3>Detection Data (CSV)</h3>
+        {% if combined_craters %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Crater ID</th>
+                    <th>Method</th>
+                    <th>Center X</th>
+                    <th>Center Y</th>
+                    <th>Diameter (m)</th>
+                    <th>Depth (m)</th>
+                    <th>Volume (m³)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in combined_craters %}
+                <tr>
+                    <td rowspan="2">{{ data.crater_id }}</td>
+                    <td>Shadow</td>
+                    <td>{{ data.shadow.center_x }}</td>
+                    <td>{{ data.shadow.center_y }}</td>
+                    <td>{{ data.shadow.diameter_m|round(2) }}</td>
+                    <td>{{ data.shadow.depth_m|round(2) }}</td>
+                    <td>{{ data.shadow.volume_m3|round(2) }}</td>
+                </tr>
+                <tr>
+                    <td>DEM</td>
+                    <td>{{ data.dem.center_x }}</td>
+                    <td>{{ data.dem.center_y }}</td>
+                    <td>{{ data.dem.diameter_m|round(2) }}</td>
+                    <td>{{ data.dem.depth_m|round(2) }}</td>
+                    <td>{{ data.dem.volume_m3|round(2) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No detection data available.</p>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Lunar Crater Detection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('{{ url_for("static", filename="images/solar_dark_theme.jpg") }}');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .navbar a {
+            color: #e0e0e0 !important;
+        }
+        .container {
+            background-color: rgba(0, 10, 20, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #ffffff;
+            text-shadow: 1px 1px 3px #000000;
+        }
+        p, li {
+            line-height: 1.6;
+        }
+        a {
+            color: #00bfff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .highlight {
+            background-color: #ffeb3b;
+            color: #1a1a1a;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .btn-primary {
+            background-color: #2a4066;
+            border-color: #2a4066;
+        }
+        .btn-primary:hover {
+            background-color: #1e2f4d;
+            border-color: #1e2f4d;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">Lunar Crater Analysis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('extract_page') }}">Extract</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('input_page') }}">Input</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('results') }}">Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center mb-4">About Lunar Crater Detection</h1>
+        <p>
+            This project focuses on detecting and analyzing lunar craters using advanced computer vision techniques, with a special emphasis on <span class="highlight">using the shadow method to calculate the depth of craters in 2D images</span>.
+            By leveraging shadow-based and DEM (Digital Elevation Model) methods, the tool provides detailed measurements of crater diameter, depth, and volume, enabling a comprehensive comparison of detection techniques.
+        </p>
+
+        <div class="section">
+            <h2 class="text-center mb-4">How to Use This Site</h2>
+            <p>Follow these steps to use the Lunar Crater Detection tool:</p>
+            <ul>
+                <li><strong>Step 1: Navigate to the Extract Page</strong> - Upload a GeoTIFF file containing lunar surface data. The tool will extract the necessary bands (PNG for visualization and TIFF for elevation data).</li>
+                <li><strong>Step 2: Calculate Solar Geometry</strong> - Input the observer and sub-solar coordinates (latitude and longitude) to calculate the solar elevation and azimuth. These values are crucial for <span class="highlight">shadow method</span> depth calculations.</li>
+                <li><strong>Step 3: Proceed to the Input Page</strong> - Upload the extracted PNG and TIFF files (or use new ones). Adjust the sun elevation and azimuth if needed, then run the detection process.</li>
+                <li><strong>Step 4: View Detection Results</strong> - On the Input page, view the detected craters with their measurements (center coordinates, diameter, depth, and volume) for both Shadow and DEM methods.</li>
+                <li><strong>Step 5: Analyze Results</strong> - Go to the Results page to see a comparison of the Shadow and DEM methods through charts (diameter, depth, and volume) and download the detailed CSV file.</li>
+            </ul>
+            <p><strong>Note:</strong> There are multiple types of crater shapes, and this tool cannot accurately predict the depth of all crater types using the shadow method. We plan to address this in further research.</p>
+        </div>
+
+        <div class="section">
+            <h2 class="text-center mb-4">Limitations</h2>
+            <p>While this tool is powerful, it has certain limitations:</p>
+            <ul>
+                <li><strong>Input File Requirements</strong> - The tool requires specific GeoTIFF files with appropriate bands (band 1 for PNG visualization, band 6 for elevation data). Files that do not meet these requirements may cause errors.</li>
+                <li><strong>Image Dimensions</strong> - The input images must be 500x500 pixels. Images of other sizes will result in an error during processing.</li>
+                <li><strong>Solar Geometry Accuracy</strong> - The accuracy of <span class="highlight">shadow method</span> depth calculations depends on correct solar geometry inputs. Incorrect coordinates may lead to inaccurate results.</li>
+                <li><strong>Crater Detection</strong> - The tool may miss small craters or fail to pair craters between Shadow and DEM methods if the confidence thresholds are not met or if shadows are not well-defined.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2 class="text-center mb-4">Dataset Sources</h2>
+            <p>The datasets used for lunar crater detection can be obtained from the following sources:</p>
+            <ul>
+                <li><strong>Primary Dataset</strong> - The primary dataset is sourced from <a href="https://qts.quickmap.io/fcgi-bin/fprovweb.exe?_xtype=text/html&target=MOON&cmd_script=qts_js" target="_blank">QuickMap</a>. This dataset uses the Equidistant Cylindrical (< 75 deg.) projection scale to calculate azimuth and elevation and to select the region for analysis. We will work more on this to add support for all projections in future updates.</li>
+                <li><strong>Exploration and Analysis</strong> - To select a location or region for analysis, use this link: <a href="https://quickmap.lroc.im-ldi.com/projections?prjExtent=-2784298.0405802%2C-1159442.8875775%2C1860425.4967182%2C1531273.6597422&shadowsType=all&layers=NrBsFYBoAZIRnpEBmZcAsjYIHYFcAbAyAbwF8BdC0yioA&proj=16" target="_blank">QuickMap Projections</a>.</li>
+                <li><strong>Kaggle Dataset</strong> - The refined dataset, including calculated azimuth and elevation data in the CSV and GeoTIFF images, is available on Kaggle: <a href="https://www.kaggle.com/datasets/anscollage/moonfinal991" target="_blank">MoonFinal991</a>. Users must note the observer latitude and longitude from this dataset for accurate analysis.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2 class="text-center mb-4">Project Repository</h2>
+            <p>The source code for this project is available on GitHub: <a href="https://github.com/Ansilins?tab=repositories" target="_blank">Ansilins GitHub</a>.</p>
+        </div>
+
+        <p class="text-center"><a href="{{ url_for('index') }}">Back to Home</a></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
